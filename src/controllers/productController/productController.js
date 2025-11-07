@@ -1,6 +1,6 @@
+import SSLOModel from "../../models//sslo.model.js";
 import Product from "../../models/Product.js";
 import Review from "../../models/Review.js";
-import SSLOModel from "../../models/SSLO.model.js";
 import User from "../../models/User.js";
 import productSchema from "../../validationSchema/productSchema.js";
 
