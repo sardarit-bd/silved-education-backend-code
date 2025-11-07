@@ -1,4 +1,4 @@
-import SSLOModel from "../models/SSLO.model.js"; // Import your Mongoose Model (assuming path is correct)
+import SSLOModel from "../models/sslo.model.js"; // Import your Mongoose Model (assuming path is correct)
 import { ssloSchema } from "../validationSchema/sslo.validation.js";
 
 const generateSSLO = async (req, res) => {
