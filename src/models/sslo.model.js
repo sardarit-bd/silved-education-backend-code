@@ -1,49 +1,72 @@
-import mongoose, { Document, Schema } from "mongoose";
+import mongoose from "mongoose";
 
-export interface ISSLO extends Document {
-    program?: string;
-    standardsFramework: string;
-    standardsType: string;
-    abeNrsLevel: string;
-    selectedStandard: string;
-    industry: string;
-    workforceTask: string;
-    employabilitySkills: string[];
-    supports?: string[];
-    notes?: string;
-    createdAt?: Date;
-    updatedAt?: Date;
-}
+// Mongoose Schema for Standards-Based Student Learning Objective (SSLO)
 
-const ssloSchema = new Schema < ISSLO > (
+const ssloSchema = new mongoose.Schema(
     {
-        program: { type: String, default: "" },
-
-        standardsFramework: { type: String, required: true },
-        standardsType: { type: String, required: true },
-        abeNrsLevel: { type: String, required: true },
-        selectedStandard: { type: String, required: true },
-
-        industry: { type: String, required: true },
-        workforceTask: { type: String, required: true },
-
-        employabilitySkills: {
-            type: [String],
-            required: true,
-            validate: [
-                (val: string[]) => val.length >= 1 && val.length <= 3,
-                "Employability skills must include between 1 and 3 items",
-            ],
+        // General Information
+        program: {
+            type: String,
+            default: ""
         },
 
-        supports: { type: [String], default: [] },
-        notes: { type: String, default: "" },
+        // Standards Alignment
+        standardsFramework: {
+            type: String,
+            required: true
+        },
+        standardsType: {
+            type: String,
+            required: true
+        },
+        abeNrsLevel: {
+            type: String,
+            required: true
+        },
+        selectedStandard: {
+            type: String,
+            required: true
+        },
+
+        // Context and Application
+        industry: {
+            type: String,
+            required: true
+        },
+        workforceTask: {
+            type: String,
+            required: true
+        },
+
+        // Skills and Constraints
+        employabilitySkills: {
+            type: [String], // Array of Strings
+            required: true,
+            // Custom validator to ensure array length is between 1 and 3
+            validate: {
+                validator: function (val) {
+                    return val.length >= 1 && val.length <= 3;
+                },
+                message: "Employability skills must include between 1 and 3 items",
+            },
+        },
+
+        // Notes and Supports
+        supports: {
+            type: [String],
+            default: []
+        },
+        notes: {
+            type: String,
+            default: ""
+        },
     },
     {
-        timestamps: true, // auto add createdAt / updatedAt
+        timestamps: true, // Automatically adds createdAt and updatedAt fields
     }
 );
 
-const SSLOModel = mongoose.model < ISSLO > ("SSLO", ssloSchema);
+// Create the Mongoose Model
+const SSLOModel = mongoose.model("SSLO", ssloSchema);
 
 export default SSLOModel;
