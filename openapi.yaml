@@ -1,0 +1,50 @@
+openapi: 3.1.0
+info:
+  title: Home service REST API
+  version: 1.0.0
+  description: REST API documentation for [Your Project Name]
+servers:
+  - url: https://api.example.com
+paths:
+  /auth/ragister:
+    post:
+      summary: Ragister a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              username: johndoe
+              password: securepassword
+              email: john@example.com
+              role: user
+      responses:
+        '200':
+          description: User ragistered successfully
+          content:
+            application/json:
+              example:
+                success: true
+                data:
+                  - id: 1
+                    name: John Doe
+    post:
+      /auth/login:
+      summary: login a user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              email: john@example.com
+              password: securepassword
+              role: user
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              example:
+                success: true
+                message: login successful
+

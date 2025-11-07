@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<title>SOLVED | SSLO Generator (v24.10 — CCRS intact + FL ABE RLA NRS1&2 + Framework Hook)</title>
+<style>
+  :root{ --brand-ink:#0f1a24; --brand-blue:#0b66c3; --brand-green:#19966b; --muted:#5f6a6e; --bg:#f7fbf9; --line:#e6ecef; --tag-bg:#f1ecfe; --tag-ink:#3e2a8c; --tag-line:#e2d8fe; }
+  *{box-sizing:border-box}
+  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin:0;background:#fff;color:var(--brand-ink)}
+  header{padding:18px 20px;border-bottom:1px solid var(--line);background:#fff;position:sticky;top:0;z-index:2}
+  header .brand{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:14px}
+  header img.logo{height:36px;width:auto}
+  header h1{font-size:18px;margin:0;font-weight:700;color:var(--brand-ink)}
+  .brand-spacer{flex:1}
+  .brand-pill{font-size:12px;background:linear-gradient(90deg,var(--brand-blue),var(--brand-green));color:#fff;padding:6px 10px;border-radius:999px}
+  .wrap{max-width:1100px;margin:18px auto 56px;padding:0 20px}
+  h2{margin:10px 0 6px;font-size:24px}
+  p.hint{color:var(--muted);margin:4px 0 16px}
+  .card{border:1px solid var(--line);border-radius:12px;padding:18px;margin:14px 0;background:#fff}
+  .grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+  label{font-weight:600;font-size:14px;margin-bottom:4px;display:block}
+  select,input,textarea{width:100%;padding:10px;border:1px solid #cfd8dc;border-radius:8px;font-size:14px}
+  textarea{min-height:72px}
+  .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+  .btn{background:var(--brand-blue);color:#fff;border:none;border-radius:8px;padding:10px 14px;cursor:pointer}
+  .btn.secondary{background:var(--brand-green)}
+  .btn.ghost{background:#fff;color:var(--brand-blue);border:1px solid var(--brand-blue)}
+  .output{margin-top:18px;padding:14px;border-left:4px solid var(--brand-green);background:var(--bg);border-radius:6px;white-space:pre-wrap}
+  .two-col{display:grid;grid-template-columns:1.1fr .9fr;gap:18px}
+  @media(max-width:900px){.grid{grid-template-columns:1fr}.two-col{grid-template-columns:1fr}}
+  .listbox{border:1px solid var(--line);border-radius:12px;padding:16px;background:#fff}
+  .listbox h3{margin:0 0 8px}
+  #objList{list-style:decimal;padding-left:18px;margin:10px 0}
+  #objList li{margin:12px 0}
+  .small{font-size:12px;color:var(--muted)}
+  .std-scroll{border:1px solid var(--line);border-radius:8px;padding:8px;max-height:400px;overflow:auto;background:#fff}
+  .std-item{display:block;margin:6px 0;white-space:normal}
+  .tag{display:inline-block;background:var(--tag-bg);color:var(--tag-ink);border:1px solid var(--tag-line);border-radius:6px;padding:1px 6px;font-size:12px;margin-right:6px}
+  .empty{padding:8px 10px;color:var(--muted)}
+  footer{padding:18px 20px;border-top:1px solid var(--line);color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <div class='brand'>
+    <img class='logo' alt='SOLVED logo' src='SOLVED PNG (for web) copy.png' onerror="this.style.display='none'">
+    <h1>SOLVED – SSLO Generator</h1>
+    <div class='brand-spacer'></div>
+    <div class='brand-pill'>v24.10</div>
+  </div>
+</header>
+
+<div class='wrap'>
+  <h2>Create integrated objectives (form-ready)</h2>
+  <p class='hint'>Template: <strong>Students will be able to [standard] by [workforce task], and using [employability skills]</strong> [+ optional supports, notes]. Industry only filters the task list and is not included in the output.</p>
+
+  <div class='card'>
+    <div class='grid'>
+      <div>
+        <label>Program / School (optional)</label>
+        <input id='program' placeholder='e.g., SOLVED Adult Education Program' />
+      </div>
+      <div>
+        <label>Standards Framework</label>
+        <select id='framework'>
+          <option value='CCRS' selected>CCRS (National)</option>
+          <option value='FLBEST'>Florida – B.E.S.T. (ABE)</option>
+        </select>
+        <div class='small' style='margin-top:4px;color:var(--muted)'>Florida ABE RLA is defined for ABE NRS 1–4; 5–6 intentionally empty.</div>
+      </div>
+      <div>
+        <label>Standards type</label>
+        <select id='stdType'>
+          <optgroup label='English Language Arts & Literacy'>
+            <option value='ABE_READ'>Reading (CCRS)</option>
+            <option value='ABE_LANG'>Language (CCRS)</option>
+            <option value='ABE_WRITE'>Writing (CCRS)</option>
+            <option value='ABE_SPEAK'>Speaking & Listening (CCRS)</option>
+            <option value='ABE_FOUND'>Foundational Skills (CCRS)</option>
+            <option value='FL_RLA'>Florida ABE Reasoning through Language Arts (B.E.S.T.)</option>
+          </optgroup>
+          <optgroup label='Mathematics'>
+            <option value='ABE_BASETEN'>Mathematics: Base Ten (CCRS)</option>
+            <option value='ABE_NUMSYS'>Mathematics: The Number System (CCRS)</option>
+            <option value='ABE_OAT'>Mathematics: Operations & Algebraic Thinking (CCRS)</option>
+            <option value='ABE_GEOM'>Mathematics: Geometry (CCRS)</option>
+            <option value='ABE_MEASDATA'>Mathematics: Measurement & Data (CCRS)</option>
+            <option value='ABE_FRACT'>Mathematics: Fractions (CCRS)</option>
+            <option value='ABE_RATIO'>Mathematics: Ratios & Proportional Relationships (CCRS)</option>
+            <option value='ABE_EXPR'>Mathematics: Expressions & Equations (CCRS)</option>
+            <option value='ABE_STATS'>Mathematics: Statistics and Probability (CCRS)</option>
+            <option value='ABE_FUNC'>Mathematics: Functions (CCRS)</option>
+            <option value='ABE_QUANT'>Mathematics: Quantities (CCRS)</option>
+            <option value='ABE_ALG'>Mathematics: Algebra (CCRS)</option>
+          </optgroup>
+          <optgroup label='ESOL'>
+            <option value='ELP'>ELP Anchor Standards</option>
+          </optgroup>
+        </select>
+      </div>
+      <div>
+        <label>ABE NRS Level</label>
+        <select id='nrs'>
+          <option value='ABE NRS 1'>ABE NRS 1</option>
+          <option value='ABE NRS 2'>ABE NRS 2</option>
+          <option value='ABE NRS 3'>ABE NRS 3</option>
+          <option value='ABE NRS 4'>ABE NRS 4</option>
+          <option value='ABE NRS 5'>ABE NRS 5</option>
+          <option value='ABE NRS 6'>ABE NRS 6</option>
+        </select>
+      </div>
+      <div style='grid-column:1/-1'>
+        <label id='stdLabel'>Standard (select one)</label>
+        <div id='stdContainer' class='std-scroll'></div>
+      </div>
+      <div>
+        <label>Filter tasks by industry (not shown in output)</label>
+        <select id='industry'>
+          <option>Health Science</option>
+          <option>Information Technology Assistant</option>
+          <option>Semiconductor / Advanced Manufacturing</option>
+        </select>
+      </div>
+      <div>
+        <label>Workforce Task</label>
+        <select id='task'></select>
+      </div>
+      <div>
+        <label>Employability skills (up to 3)</label>
+        <select id='skills' multiple size='8'></select>
+        <p class='small'>Hold Ctrl/Cmd to select multiple. Add a custom skill below:</p>
+        <input id='customSkill' placeholder='add a custom skill and press Enter' />
+      </div>
+      <div>
+        <label>Supports / scaffolds (optional)</label>
+        <select id='supports' multiple size='8'></select>
+        <p class='small'>Hold Ctrl/Cmd to select multiple. Add a custom support below:</p>
+        <input id='customSupport' placeholder='add a custom support and press Enter' />
+      </div>
+      <div>
+        <label>Notes (optional)</label>
+        <textarea id='notes' placeholder='any extra conditions (e.g., with a bilingual glossary)'></textarea>
+      </div>
+    </div>
+    <div class='row'>
+      <button class='btn' id='generate'>Generate</button>
+      <button class='btn secondary' id='add'>Add to list</button>
+      <button class='btn ghost' id='copyOne'>Copy last</button>
+      <button class='btn' id='reset'>Reset</button>
+    </div>
+    <div class='output' id='output' style='display:none'></div>
+  </div>
+
+  <div class='two-col'>
+    <div></div>
+    <div>
+      <div class='listbox'>
+        <h3>Objective list</h3>
+        <ol id='objList'></ol>
+        <div class='row'>
+          <button class='btn secondary' id='copyAll'>Copy all</button>
+          <button class='btn ghost' id='downloadTxt'>Download .txt</button>
+          <button class='btn ghost' id='downloadRtf'>Export to Word (.rtf)</button>
+          <button class='btn' id='clearAll'>Clear list</button>
+        </div>
+        <label for='allText' class='small'>Form-ready text (editable)</label>
+        <textarea id='allText' placeholder='Your objectives will appear here, one per blank line.'></textarea>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>© <span id='year'></span> SOLVED LLC</footer>
+
+<script>
+function item(code, phrase, tag){ return {code, phrase, tag}; }
+
+// === Inject datasets ===
+
+// ==================== FULL CCRS DATASETS (v24.7_full + new math strands) ====================
+// (ELA + Math, including Functions, Quantities, Algebra, extended Stats)
+
+// --- CCRS READING ---
+
+const FL_ABE_RLA = {
+  'ABE NRS 3': [
+    item('RLA.L3.F.1.3', 'use knowledge of grade-appropriate phonics and word-analysis skills to decode words.', 'Foundational Skills'),
+    item('RLA.L3.F.1.4', 'read grade-level texts with accuracy, automaticity, and appropriate prosody or expression to support comprehension.', 'Foundational Skills'),
+    item('RLA.L3.R.2.1', 'explain how text features (including charts, graphs, diagrams, time lines, animations, or interactive elements on web pages) contribute to the overall meaning and identify the text structures of problem/solution, sequence, and description in texts.', 'Reading'),
+    item('RLA.L3.R.2.2', 'explain how relevant details support the central idea(s), implied or explicit.', 'Reading'),
+    item('RLA.L3.R.2.3', 'analyze an author’s purpose and/or perspective in an informational text.', 'Reading'),
+    item('RLA.L3.R.2.4', 'track the development of an argument, identifying the specific claim(s), evidence, and reasoning.', 'Reading'),
+    item('RLA.L3.R.2.5', 'explain events, procedures, ideas, or concepts in a historical, scientific, or technical text, including what happened and why, based on specific information in the text.', 'Reading'),
+    item('RLA.L3.R.3.1', 'analyze and explain how figurative language contributes to meaning in text(s).', 'Reading'),
+    item('RLA.L3.R.3.2', 'summarize a text to enhance comprehension (include the central idea and relevant details for an informational text).', 'Reading'),
+    item('RLA.L3.R.3.3', 'compare and contrast primary and secondary sources related to the same topic or event.', 'Reading'),
+    item('RLA.L3.C.1.1', 'demonstrate fluent and legible cursive writing skills.', 'Communication'),
+    item('RLA.L3.C.1.2', 'write personal or fictional narratives using a logical sequence of events and demonstrating an effective use of techniques such as dialogue, description, and transitional words and phrases.', 'Communication'),
+    item('RLA.L3.C.1.3', 'write to make a claim supporting a perspective with logical reasons, relevant evidence from sources, elaboration, and an organizational structure with varied transitions.', 'Communication'),
+    item('RLA.L3.C.1.4', 'write expository texts about a topic using multiple sources and including an introduction, organizational structure, relevant elaboration, varied transitions, precise language and domain-specific vocabulary, and a conclusion.', 'Communication'),
+    item('RLA.L3.C.1.5', 'improve writing by planning, revising, and editing, with guidance and support from adults and feedback from peers.', 'Communication'),
+    item('RLA.L3.C.2.1', 'present information orally, in a logical sequence, using nonverbal cues, appropriate volume, clear pronunciation, and appropriate pacing.', 'Communication'),
+    item('RLA.L3.C.3.1', 'follow the rules of standard english grammar, punctuation, capitalization, and spelling appropriate to grade level.', 'Communication'),
+    item('RLA.L3.C.4.1', 'conduct research to answer a question, organizing information about the topic and using multiple reliable and valid (print and digital) sources.', 'Communication'),
+    item('RLA.L3.C.5.1', 'arrange multimedia elements to create emphasis and/or clarity in oral or written tasks.', 'Communication'),
+    item('RLA.L3.C.5.2', 'use digital writing tools individually or collaboratively to plan, draft, and revise writing.', 'Communication'),
+    item('RLA.L3.V.1.1', 'use grade-level academic vocabulary appropriately in speaking and writing.', 'Vocabulary'),
+    item('RLA.L3.V.1.2', 'apply knowledge of greek and latin roots and affixes, recognizing the connection between affixes and parts of speech, to determine the meaning of unfamiliar words in grade-level content.', 'Vocabulary'),
+    item('RLA.L3.V.1.3', 'use context clues, figurative language, word relationships, reference materials, and/or background knowledge to determine the meaning of multiple-meaning and unknown words and phrases, appropriate to grade level.', 'Vocabulary')
+  ]
+};
+const CCRS_READING = {
+  'ABE NRS 1': [
+    item('R.NRS1.1','ask and answer questions about key details in a text','Key Details'),
+    item('R.NRS1.2','identify the main topic and retell key details of a text','Central Idea'),
+    item('R.NRS1.3','describe the connection between two individuals, events, ideas, or pieces of information in a text','Relationships/Sequence'),
+    item('R.NRS1.4','ask and answer questions to determine or clarify the meaning of words and phrases in a text','Vocabulary'),
+    item('R.NRS1.5','use text features (e.g., headings, table of contents, glossaries, electronic menus, icons) to locate key facts or information','Text Features'),
+    item('R.NRS1.6','use illustrations and details (e.g., maps, charts, photographs, political cartoons) to describe key ideas','Visual Information'),
+    item('R.NRS1.7','identify the reasons an author gives to support points in a text','Argument/Claims'),
+    item('R.NRS1.8','identify basic similarities and differences between two texts on the same topic (e.g., in illustrations, descriptions, or procedures)','Compare/Contrast')
+  ],
+  'ABE NRS 2': [
+    item('R.NRS2.1','ask and answer who, what, where, when, why, and how questions to demonstrate understanding of key details in a text','Key Details'),
+    item('R.NRS2.2','determine the main idea of a text; recount key details and explain how they support the main idea','Central Idea'),
+    item('R.NRS2.3','describe relationships among historical events, scientific ideas or concepts, or steps in technical procedures using language of time, sequence, and cause/effect','Relationships/Sequence'),
+    item('R.NRS2.4','determine the meaning of general academic and domain-specific words and phrases relevant to a topic or subject area','Vocabulary'),
+    item('R.NRS2.5','know and use text features (e.g., captions, bold print, subheadings, glossaries, indexes, electronic menus, icons) to locate key facts or information efficiently','Text Features'),
+    item('R.NRS2.6','use text features and search tools (e.g., key words, sidebars, hyperlinks) to locate information relevant to a given topic efficiently','Text Features'),
+    item('R.NRS2.7','identify the main purpose of a text, including what the author wants to answer, explain, or describe','Purpose'),
+    item('R.NRS2.8','distinguish one\'s own point of view from that of the author of a text','Point of View'),
+    item('R.NRS2.9','use information from illustrations (e.g., maps, photographs) and the words in a text to demonstrate understanding of where, when, why, and how key events occur','Visual Information'),
+    item('R.NRS2.10','explain how specific aspects of a text\'s illustrations contribute to what is conveyed by the words (e.g., create mood, emphasize aspects of a character or setting)','Visual Information'),
+    item('R.NRS2.11','describe how reasons support specific points the author makes in a text','Argument/Claims'),
+    item('R.NRS2.12','compare and contrast the most important points and key details presented in two texts on the same topic','Compare/Contrast'),
+    item('R.NRS2.C','read and comprehend complex literary and informational texts independently and proficiently','Comprehension')
+  ],
+  'ABE NRS 3': [
+    item('R.NRS3.1','refer to details and examples in a text when explaining what the text says explicitly and when drawing inferences','Key Details'),
+    item('R.NRS3.2','quote accurately from a text when explaining what the text says explicitly and when drawing inferences','Evidence/Citation'),
+    item('R.NRS3.3','determine the main idea of a text and explain how it is supported by key details; summarize the text','Central Idea'),
+    item('R.NRS3.4','determine a theme of a story, drama, or poem from details in the text; summarize the text','Theme/Summary'),
+    item('R.NRS3.5','explain events, procedures, ideas, or concepts in a historical, scientific, or technical text, including what happened and why','Relationships/Sequence'),
+    item('R.NRS3.6','determine the meaning of general academic and domain-specific words and phrases in a text relevant to a topic','Vocabulary'),
+    item('R.NRS3.7','determine the meaning of words and phrases as they are used in a text, including figurative language such as metaphors and similes','Vocabulary/Figurative'),
+    item('R.NRS3.8','describe the overall structure (e.g., chronology, comparison, cause/effect, problem/solution) of events, ideas, concepts, or information in a text or part of a text','Text Structure'),
+    item('R.NRS3.9','compare and contrast the overall structure (e.g., chronology, comparison, cause/effect, problem/solution) of events, ideas, concepts, or information in two or more texts','Text Structure'),
+    item('R.NRS3.10','analyze multiple accounts of the same event or topic, noting important similarities and differences in the point of view they represent','Point of View'),
+    item('R.NRS3.11','describe how a narrator\'s or speaker\'s point of view influences how events are described','Point of View'),
+    item('R.NRS3.12','interpret information presented visually, orally, or quantitatively (e.g., charts, graphs, diagrams, timelines, animations, interactive elements) and explain how it contributes to understanding','Visual/Quantitative'),
+    item('R.NRS3.13','draw on information from multiple print or digital sources to locate an answer to a question quickly or to solve a problem efficiently','Research/Search'),
+    item('R.NRS3.14','explain how an author uses reasons and evidence to support particular points, identifying which reasons and evidence support which points','Argument/Claims'),
+    item('R.NRS3.15','integrate information from several texts on the same topic in order to write or speak about the subject knowledgeably','Synthesis'),
+    item('R.NRS3.C','read and comprehend complex literary and informational texts independently and proficiently','Comprehension')
+  ],
+  'ABE NRS 4': [
+    item('R.NRS4.1','cite several pieces of textual evidence to support analysis of what the text says explicitly as well as inferences drawn from the text','Evidence/Citation'),
+    item('R.NRS4.2','determine a theme or central idea of a text and how it is conveyed through particular details; provide a summary distinct from personal opinions or judgments','Central Idea/Theme'),
+    item('R.NRS4.3','analyze how a text makes connections among and distinctions between individuals, ideas, or events (e.g., comparisons, analogies, or categories)','Relationships/Connections'),
+    item('R.NRS4.4','follow precisely a multistep procedure when carrying out experiments, taking measurements, or performing technical tasks','Procedures/Process'),
+    item('R.NRS4.5','determine the meaning of words and phrases as they are used in a text, including figurative, connotative, and technical meanings; analyze the impact of specific word choices on meaning and tone','Vocabulary/Tone'),
+    item('R.NRS4.6','analyze how a particular sentence, paragraph, chapter, or section fits into the overall structure of a text and contributes to the development of the ideas','Text Structure'),
+    item('R.NRS4.7','analyze the structure an author uses to organize a text, including how the major sections contribute to the whole and to the development of the ideas','Text Structure'),
+    item('R.NRS4.8','determine an author\'s point of view or purpose in a text and analyze how the author acknowledges and responds to conflicting evidence or viewpoints','Point of View/Purpose'),
+    item('R.NRS4.9','identify aspects of a text that reveal an author\'s point of view or purpose (e.g., loaded language, inclusion or avoidance of particular facts)','Point of View/Purpose'),
+    item('R.NRS4.10','integrate information presented in different media or formats (e.g., charts, graphs, photographs, videos, maps) as well as in words to develop a coherent understanding of a topic or issue','Visual/Quantitative'),
+    item('R.NRS4.11','integrate quantitative or technical information expressed in words in a text with a version of that information expressed visually (e.g., flowchart, diagram, model, graph, or table)','Visual/Quantitative'),
+    item('R.NRS4.12','delineate and evaluate the argument and specific claims in a text, assessing whether reasoning is sound and evidence is relevant and sufficient; recognize when irrelevant evidence is introduced','Argument'),
+    item('R.NRS4.13','analyze a case in which two or more texts provide conflicting information on the same topic and identify where the texts disagree on matters of fact or interpretation','Conflicting Sources'),
+    item('R.NRS4.C','read and comprehend complex literary and informational texts independently and proficiently','Comprehension')
+  ],
+  'ABE NRS 5': [
+    item('R.NRS5.1','cite strong and thorough textual evidence to support analysis of what the text says explicitly as well as inferences','Evidence/Citation'),
+    item('R.NRS5.2','determine a theme or central idea and analyze in detail its development over the course of the text; provide an objective summary','Central Idea/Theme'),
+    item('R.NRS5.3','analyze in detail a series of events; determine whether earlier events caused later ones or simply preceded them','Relationships/Causation'),
+    item('R.NRS5.4','follow precisely a complex multistep procedure in experiments, measurements, or technical tasks, attending to special cases or exceptions','Procedures/Process'),
+    item('R.NRS5.5','determine the meaning of words and phrases, including figurative, connotative, and technical meanings; analyze the cumulative impact of word choices on meaning and tone','Vocabulary/Tone'),
+    item('R.NRS5.6','analyze in detail how an author\'s ideas or claims are developed and refined by particular sentences, paragraphs, or larger portions of a text','Development of Ideas'),
+    item('R.NRS5.7','determine an author\'s point of view or purpose and analyze how rhetoric is used to advance it','Point of View/Rhetoric'),
+    item('R.NRS5.8','compare the point of view of two or more authors on the same or similar topics, including which details they include and emphasize','Point of View/Compare'),
+    item('R.NRS5.9','integrate quantitative or technical analysis (e.g., charts, research data) with qualitative analysis in print or digital text','Visual/Quantitative'),
+    item('R.NRS5.10','translate quantitative or technical information expressed in words into visual form (e.g., table or chart) and translate visual/mathematical information into words','Visual/Quantitative'),
+    item('R.NRS5.11','delineate and evaluate the argument and specific claims in a text; identify false statements and fallacious reasoning','Argument'),
+    item('R.NRS5.12','analyze seminal u.s. documents of historical and literary significance for how they address related themes and concepts','Foundational Docs'),
+    item('R.NRS5.13','compare and contrast findings presented in a text to those from other sources, noting when findings support or contradict previous explanations','Conflicting Sources'),
+    item('R.NRS5.C','read and comprehend complex literary and informational texts independently and proficiently','Comprehension')
+  ],
+  'ABE NRS 6': [
+    item('R.NRS6.1','determine the central ideas or conclusions of a text; summarize complex concepts, processes, or information in simpler but accurate terms','Central Idea/Summary'),
+    item('R.NRS6.2','analyze a complex set of ideas or sequence of events and explain how specific individuals, ideas, or events interact and develop over the text','Relationships/Development'),
+    item('R.NRS6.3','analyze and evaluate the effectiveness of the structure an author uses in an exposition or argument','Text Structure/Argument'),
+    item('R.NRS6.4','analyze cases where grasping point of view requires distinguishing what is directly stated from what is really meant (e.g., satire, sarcasm, irony, understatement)','Point of View/Irony'),
+    item('R.NRS6.5','integrate and evaluate multiple sources of information presented in different media or formats as well as in words to address a question or solve a problem','Synthesis/Evaluation'),
+    item('R.NRS6.6','analyze seventeenth-, eighteenth-, and nineteenth-century foundational u.s. documents for themes, purposes, and rhetorical features','Foundational Docs/Rhetoric'),
+    item('R.NRS6.C','read and comprehend complex literary and informational texts independently and proficiently','Comprehension')
+  ]
+};
+
+// --- CCRS LANGUAGE ---
+const CCRS_LANGUAGE = {
+  'ABE NRS 1': [
+    item('L.NRS1.1','demonstrate command of the conventions of standard english grammar and usage when writing or speaking','Grammar'),
+    item('L.NRS1.2','demonstrate command of the conventions of standard english capitalization, punctuation, and spelling when writing','Punctuation'),
+    item('L.NRS1.3','determine or clarify the meaning of unknown and multiple-meaning words and phrases, choosing flexibly from an array of strategies','Vocabulary'),
+    item('L.NRS1.4','with guidance and support, demonstrate understanding of word relationships and nuances in word meanings','Word Relationships'),
+    item('L.NRS1.5','use words and phrases acquired through conversations, reading and being read to, and responding to texts, including using frequently occurring conjunctions to signal simple relationships','Language Use')
+  ],
+  'ABE NRS 2': [
+    item('L.NRS2.1','demonstrate command of the conventions of standard english grammar and usage when writing or speaking','Grammar'),
+    item('L.NRS2.2','demonstrate command of the conventions of standard english capitalization, punctuation, and spelling when writing','Punctuation'),
+    item('L.NRS2.3','use knowledge of language and its conventions when writing, speaking, reading, or listening','Language Use'),
+    item('L.NRS2.4','determine or clarify the meaning of unknown and multiple-meaning words and phrases, choosing flexibly from an array of strategies','Vocabulary'),
+    item('L.NRS2.5','demonstrate understanding of word relationships and nuances in word meanings','Word Relationships'),
+    item('L.NRS2.6','use words and phrases acquired through conversations, reading and being read to, and responding to texts, including using adjectives and adverbs to describe','Language Use'),
+    item('L.NRS2.7','acquire and use accurately level-appropriate conversational, general academic, and domain-specific words and phrases','Vocabulary')
+  ],
+  'ABE NRS 3': [
+    item('L.NRS3.1','demonstrate command of the conventions of standard english grammar and usage when writing or speaking','Grammar'),
+    item('L.NRS3.2','demonstrate command of the conventions of standard english capitalization, punctuation, and spelling when writing','Punctuation'),
+    item('L.NRS3.3','use knowledge of language and its conventions when writing, speaking, reading, or listening','Language Use'),
+    item('L.NRS3.4','determine or clarify the meaning of unknown and multiple-meaning words and phrases, choosing flexibly from an array of strategies','Vocabulary'),
+    item('L.NRS3.5','demonstrate understanding of figurative language, word relationships, and nuances in word meanings','Word Relationships/Figurative'),
+    item('L.NRS3.6','acquire and use accurately level-appropriate general academic and domain-specific words and phrases','Vocabulary')
+  ],
+  'ABE NRS 4': [
+    item('L.NRS4.1','demonstrate command of the conventions of standard english grammar and usage when writing or speaking','Grammar'),
+    item('L.NRS4.2','demonstrate command of the conventions of standard english capitalization, punctuation, and spelling when writing','Punctuation'),
+    item('L.NRS4.3','use knowledge of language and its conventions when writing, speaking, reading, or listening','Language Use'),
+    item('L.NRS4.4','determine or clarify the meaning of unknown and multiple-meaning words and phrases, choosing flexibly from an array of strategies','Vocabulary'),
+    item('L.NRS4.5','acquire and use accurately level-appropriate general academic and domain-specific words and phrases; gather vocabulary knowledge when considering a word or phrase important to comprehension or expression','Vocabulary')
+  ],
+  'ABE NRS 5': [
+    item('L.NRS5.1','demonstrate command of the conventions of standard english grammar and usage when writing or speaking','Grammar'),
+    item('L.NRS5.2','demonstrate command of the conventions of standard english capitalization, punctuation, and spelling when writing','Punctuation'),
+    item('L.NRS5.3','determine or clarify the meaning of unknown and multiple-meaning words and phrases, choosing flexibly from an array of strategies','Vocabulary')
+  ],
+  'ABE NRS 6': [
+    item('L.NRS6.1','demonstrate command of the conventions of standard english grammar and usage when writing or speaking','Grammar'),
+    item('L.NRS6.2','determine or clarify the meaning of unknown and multiple-meaning words and phrases, choosing flexibly from an array of strategies','Vocabulary'),
+    item('L.NRS6.3','acquire and use accurately general academic and domain-specific words and phrases, sufficient for reading, writing, speaking, and listening at the college and career readiness level; demonstrate independence in gathering vocabulary knowledge when considering a word or phrase important to comprehension or expression','Vocabulary')
+  ]
+};
+
+// --- CCRS WRITING ---
+const CCRS_WRITING = {
+  'ABE NRS 1': [
+    item('W.NRS1.1','write informative/explanatory texts in which they name a topic, supply some facts about the topic, and provide some sense of closure','Informative/Explanatory'),
+    item('W.NRS1.2','write narratives in which they recount two or more appropriately sequenced events, include some details regarding what happened, use temporal words to signal event order, and provide some sense of closure','Narrative'),
+    item('W.NRS1.3','with guidance and support, focus on a topic, respond to questions and suggestions from peers, and add details to strengthen writing as needed','Strengthen'),
+    item('W.NRS1.4','with guidance and support, use a variety of digital tools to produce and publish writing, including in collaboration with peers','Technology'),
+    item('W.NRS1.5','participate in shared research and writing projects','Research'),
+    item('W.NRS1.6','with guidance and support, recall information from experiences or gather information from provided sources to answer a question','Gather Info')
+  ],
+  'ABE NRS 2': [
+    item('W.NRS2.1','write opinion pieces on topics or texts, supporting a point of view with reasons','Opinion'),
+    item('W.NRS2.2','write informative/explanatory texts to examine a topic and convey ideas and information clearly','Informative/Explanatory'),
+    item('W.NRS2.3','write narratives in which they recount a well elaborated event or short sequence of events, include details to describe actions, thoughts, and feelings, use temporal words to signal event order, and provide a sense of closure','Narrative'),
+    item('W.NRS2.4','produce writing in which the development and organization are appropriate to task and purpose','Coherence'),
+    item('W.NRS2.5','with guidance and support from peers and others, develop and strengthen writing as needed by planning, revising, and editing','Strengthen'),
+    item('W.NRS2.6','with guidance and support, use technology to produce and publish writing (using keyboarding skills) and to interact and collaborate with others','Technology'),
+    item('W.NRS2.7','conduct short research projects that build knowledge about a topic','Research'),
+    item('W.NRS2.8','recall information from experiences or gather information from print and digital sources; take brief notes on sources and sort evidence into provided categories','Gather Info')
+  ],
+  'ABE NRS 3': [
+    item('W.NRS3.1','write opinion pieces on topics or texts, supporting a point of view with reasons and information','Opinion'),
+    item('W.NRS3.2','write informative/explanatory texts to examine a topic and convey ideas and information clearly','Informative/Explanatory'),
+    item('W.NRS3.3','produce clear and coherent writing in which the development and organization are appropriate to task, purpose, and audience','Coherence'),
+    item('W.NRS3.4','with guidance and support from peers and others, develop and strengthen writing as needed by planning, revising, editing, rewriting, or trying a new approach','Strengthen'),
+    item('W.NRS3.5','with some guidance and support, use technology, including the internet, to produce and publish writing and to interact and collaborate with others; demonstrate sufficient command of keyboarding skills to type a minimum of one page in a single setting','Technology'),
+    item('W.NRS3.6','conduct short research projects that use several sources to build knowledge through investigation of different aspects of a topic','Research'),
+    item('W.NRS3.7','recall relevant information from experiences or gather relevant information from print and digital sources; summarize or paraphrase information in notes and finished work, and provide a list of sources','Gather Info'),
+    item('W.NRS3.8','draw evidence from literary or informational texts to support analysis, reflection, and research','Evidence')
+  ],
+  'ABE NRS 4': [
+    item('W.NRS4.1','write arguments to support claims with clear reasons and relevant evidence','Argument'),
+    item('W.NRS4.2','write informative/explanatory texts to examine a topic and convey ideas, concepts, and information through the selection, organization, and analysis of relevant content','Informative/Explanatory'),
+    item('W.NRS4.3','produce clear and coherent writing in which the development, organization, and style are appropriate to task, purpose, and audience','Coherence'),
+    item('W.NRS4.4','with some guidance and support from peers and others, develop and strengthen writing as needed by planning, revising, editing, rewriting, or trying a new approach, focusing on how well purpose and audience have been addressed','Strengthen'),
+    item('W.NRS4.5','use technology, including the internet, to produce and publish writing and link to and cite sources as well as to interact and collaborate with others','Technology'),
+    item('W.NRS4.6','conduct short research projects to answer a question, drawing on several sources and generating additional related, focused questions for further research and investigation','Research'),
+    item('W.NRS4.7','gather relevant information from multiple print and digital sources, using search terms effectively; assess the credibility and accuracy of each source; and quote or paraphrase the data and conclusions of others while avoiding plagiarism and following a standard format for citation','Gather Info'),
+    item('W.NRS4.8','draw evidence from literary or informational texts to support analysis, reflection, and research','Evidence')
+  ],
+  'ABE NRS 5': [
+    item('W.NRS5.1','write arguments to support claims in an analysis of substantive topics or texts, using valid reasoning and relevant and sufficient evidence','Argument'),
+    item('W.NRS5.2','write informative/explanatory texts to examine and convey complex ideas, concepts, and information clearly and accurately through the effective selection, organization, and analysis of content','Informative/Explanatory'),
+    item('W.NRS5.3','gather relevant information from multiple authoritative print and digital sources, using advanced searches effectively; assess the usefulness of each source in answering the research question; integrate information into the text selectively to maintain the flow of ideas, avoiding plagiarism and following a standard format for citation','Gather Info')
+  ],
+  'ABE NRS 6': [
+    item('W.NRS6.1','produce clear and coherent writing in which the development, organization, and style are appropriate to task, purpose, and audience','Coherence'),
+    item('W.NRS6.2','develop and strengthen writing as needed by planning, revising, editing, rewriting, or trying a new approach, focusing on addressing what is most significant for a specific purpose and audience','Strengthen'),
+    item('W.NRS6.3','use technology, including the internet, to produce, publish, and update individual or shared writing products, taking advantage of technology\'s capacity to link to other information and to display information flexibly and dynamically','Technology'),
+    item('W.NRS6.4','conduct short as well as more sustained research projects to answer a question','Research'),
+    item('W.NRS6.5','draw evidence from literary or informational texts to support analysis, reflection, and research','Evidence')
+  ]
+};
+
+// --- CCRS SPEAKING & LISTENING ---
+const CCRS_SPEAK_LISTEN = {
+  'ABE NRS 1': [
+    item('SL.NRS1.1','participate in collaborative conversations with diverse partners in small and larger groups','Discussion'),
+    item('SL.NRS1.2','confirm understanding of a text read aloud or information presented orally or through other media by asking and answering questions about key details and requesting clarification if something is not understood','Comprehension'),
+    item('SL.NRS1.3','ask and answer questions in order to seek help, get information, or clarify something that is not understood','Questioning'),
+    item('SL.NRS1.4','describe people, places, things, and events with relevant details, expressing ideas and feelings clearly','Presentation'),
+    item('SL.NRS1.5','speak audibly and express thoughts, feelings, and ideas clearly','Register'),
+    item('SL.NRS1.6','produce complete sentences when appropriate to task and situation','Register')
+  ],
+  'ABE NRS 2': [
+    item('SL.NRS2.1','engage effectively in a range of collaborative discussions (one-on-one, in groups, and teacher-led) with diverse partners, building on others’ ideas and expressing their own clearly','Discussion'),
+    item('SL.NRS2.2','determine the main ideas and supporting details of a text read aloud or information presented in diverse media and formats, including visually, quantitatively, and orally','Comprehension'),
+    item('SL.NRS2.3','ask and answer questions about information from a speaker, offering appropriate elaboration and detail','Questioning'),
+    item('SL.NRS2.4','report on a topic or text, tell a story, or recount an experience with appropriate facts and relevant, descriptive details, speaking clearly at an understandable pace','Presentation'),
+    item('SL.NRS2.5','speak in complete sentences when appropriate to task and situation in order to provide requested detail or clarification','Register')
+  ],
+  'ABE NRS 3': [
+    item('SL.NRS3.1','engage effectively in a range of collaborative discussions (one-on-one, in groups, and teacher-led) with diverse partners, building on others’ ideas and expressing their own clearly','Discussion'),
+    item('SL.NRS3.2','determine the main ideas and supporting details of a text read aloud or information presented in diverse media and formats, including visually, quantitatively, and orally','Comprehension'),
+    item('SL.NRS3.3','summarize a written text read aloud or information presented in diverse media and formats, including visually, quantitatively, and orally','Comprehension'),
+    item('SL.NRS3.4','summarize the points a speaker makes and explain how each claim is supported by reasons and evidence','Evaluation'),
+    item('SL.NRS3.5','report on a topic or text or present an opinion, sequencing ideas logically and using appropriate facts and relevant, descriptive details to support main ideas or themes; speak clearly at an understandable pace','Presentation'),
+    item('SL.NRS3.6','include multimedia components (e.g., graphics, sound) and visual displays in presentations when appropriate to enhance the development of main ideas or themes','Multimedia'),
+    item('SL.NRS3.7','differentiate between contexts that call for formal english and situations where informal discourse is appropriate','Register')
+  ],
+  'ABE NRS 4': [
+    item('SL.NRS4.1','engage effectively in a range of collaborative discussions (one-on-one, in groups, and teacher-led) with diverse partners, building on others’ ideas and expressing their own clearly','Discussion'),
+    item('SL.NRS4.2','analyze the purpose of information presented in diverse media and formats and evaluate the motives behind its presentation','Evaluation'),
+    item('SL.NRS4.3','delineate a speaker’s argument and specific claims, evaluating the soundness of the reasoning and relevance and sufficiency of the evidence and identifying when irrelevant evidence is introduced','Evaluation'),
+    item('SL.NRS4.4','present claims and findings, emphasizing salient points in a focused, coherent manner with relevant evidence, sound valid reasoning, and well-chosen details; use appropriate eye contact, adequate volume, and clear pronunciation','Presentation'),
+    item('SL.NRS4.5','include multimedia components (e.g., graphics, sound) and visual displays in presentations when appropriate to enhance the development of main ideas or themes','Multimedia'),
+    item('SL.NRS4.6','adapt speech to a variety of contexts and tasks, demonstrating command of formal english when indicated or appropriate','Register')
+  ],
+  'ABE NRS 5': [
+    item('SL.NRS5.1','initiate and participate effectively in a range of collaborative discussions (one-on-one, in groups, and teacher-led) with diverse partners, building on others’ ideas and expressing their own clearly and persuasively','Discussion'),
+    item('SL.NRS5.2','present information, findings, and supporting evidence clearly, concisely, and logically such that listeners can follow the line of reasoning and the organization, development, substance, and style are appropriate to purpose, audience, and task','Presentation')
+  ],
+  'ABE NRS 6': [
+    item('SL.NRS6.1','integrate multiple sources of information presented in diverse formats and media in order to make informed decisions and solve problems, evaluating the credibility and accuracy of each source and noting any discrepancies among the data','Comprehension'),
+    item('SL.NRS6.2','evaluate a speaker’s point of view, reasoning, and use of evidence and rhetoric, assessing the stance, premises, links among ideas, word choice, points of emphasis, and tone used','Evaluation'),
+    item('SL.NRS6.3','make strategic use of digital media (e.g., textual, graphical, audio, visual, and interactive elements) in presentations to enhance understanding of findings, reasoning, and evidence and to add interest','Multimedia'),
+    item('SL.NRS6.4','adapt speech to a variety of contexts and tasks, demonstrating a command of formal english when indicated or appropriate','Register')
+  ]
+};
+
+// --- CCRS FOUNDATIONAL ---
+const CCRS_FOUNDATIONAL = {
+  'ABE NRS 1': [
+    item('FS.NRS1.1','demonstrate understanding of spoken words, syllables, and sounds (phonemes)','Phonological Awareness'),
+    item('FS.NRS1.2','know and apply grade-level phonics and word analysis skills in decoding words','Phonics'),
+    item('FS.NRS1.3','read with sufficient accuracy and fluency to support comprehension','Fluency')
+  ],
+  'ABE NRS 2': [
+    item('FS.NRS2.1','know and apply grade-level phonics and word analysis skills in decoding words','Phonics'),
+    item('FS.NRS2.2','read with sufficient accuracy and fluency to support comprehension','Fluency')
+  ],
+  'ABE NRS 3': [
+    item('FS.NRS3.1','know and apply grade-level phonics and word analysis skills in decoding words','Phonics'),
+    item('FS.NRS3.2','read with sufficient accuracy and fluency to support comprehension','Fluency')
+  ]
+};
+
+// ==================== CCRS MATH ====================
+const CCRS_BASE_TEN = {
+  'ABE NRS 1': [ item('NBT.NRS1.1','understand place value','Place Value'), item('NBT.NRS1.2','use place value understanding and the properties of operations to add and subtract','Add/Subtract') ],
+  'ABE NRS 2': [ item('NBT.NRS2.1','understand place value','Place Value'), item('NBT.NRS2.2','use place value understanding and properties of operations to add and subtract','Add/Subtract'), item('NBT.NRS2.3','use place value understanding and properties of operations to perform multi-digit arithmetic','Multi-digit') ],
+  'ABE NRS 3': [ item('NBT.NRS3.1','generalize place value understanding for multi-digit whole numbers','Place Value'), item('NBT.NRS3.2','use place value understanding and properties of operations to perform multi-digit arithmetic','Multi-digit'), item('NBT.NRS3.3','understand the place value system','Place Value System'), item('NBT.NRS3.4','perform operations with multi-digit whole numbers and with decimals to hundredths','Decimals/Operations') ]
+};
+
+const CCRS_NUMBER_SYSTEM = {
+  'ABE NRS 4': [ item('NS.NRS4.1','apply and extend previous understandings of numbers to the system of rational numbers','Rational Numbers'), item('NS.NRS4.2','apply and extend previous understandings of operations with fractions to add, subtract, multiply, and divide rational numbers','Operations with Rational Numbers'), item('NS.NRS4.3','know that there are numbers that are not rational, and approximate them by rational numbers','Irrational Numbers/Approximation'), item('NS.NRS4.4','understand ratio concepts and use ratio reasoning to solve problems','Ratios'), item('NS.NRS4.5','analyze proportional relationships and use them to solve real-world and mathematical problems','Proportional Relationships') ],
+  'ABE NRS 5': [ item('NS.NRS5.1','extend the properties of exponents to rational exponents','Exponents/Rational') ],
+  'ABE NRS 6': [ item('NS.NRS6.1','extend the properties of exponents to rational exponents','Exponents/Rational') ]
+};
+
+const CCRS_OAT = {
+  'ABE NRS 1': [ item('OAT.NRS1.1','represent and solve problems involving addition and subtraction','Problem Solving (Add/Subtract)'), item('OAT.NRS1.2','understand and apply properties of operations and the relationship between addition and subtraction','Properties & Relationships'), item('OAT.NRS1.3','add and subtract within 20','Fluency within 20'), item('OAT.NRS1.4','work with addition and subtraction','Operations') ],
+  'ABE NRS 2': [ item('OAT.NRS2.1','represent and solve problems involving addition and subtraction','Problem Solving (Add/Subtract)'), item('OAT.NRS2.2','add and subtract within 20','Fluency within 20'), item('OAT.NRS2.3','represent and solve problems involving multiplication and division','Problem Solving (Mult/Div)'), item('OAT.NRS2.4','understand properties of multiplication and the relationship between multiplication and division','Properties & Relationships (Mult/Div)'), item('OAT.NRS2.5','multiply and divide within 100','Fluency within 100'), item('OAT.NRS2.6','solve problems involving the four operations, and identify and explain patterns in arithmetic','Four Operations/Patterns') ],
+  'ABE NRS 3': [ item('OAT.NRS3.1','use the four operations with whole numbers to solve problems','Four Operations/Problem Solving'), item('OAT.NRS3.2','gain familiarity with factors and multiples','Factors/Multiples'), item('OAT.NRS3.3','generate and analyze patterns','Patterns'), item('OAT.NRS3.4','write and interpret numerical expressions','Numerical Expressions') ]
+};
+
+const CCRS_GEOMETRY = {
+  'ABE NRS 1': [ item('GEO.NRS1.1','analyze, compare, create, compose shapes','Shapes/Compose'), item('GEO.NRS1.2','reason with shapes and their attributes','Attributes/Reasoning') ],
+  'ABE NRS 2': [ item('GEO.NRS2.1','reason with shapes and their attributes','Attributes/Reasoning') ],
+  'ABE NRS 3': [ item('GEO.NRS3.1','draw and identify lines and angles, and classify shapes by properties of their lines and angles','Lines/Angles/Classification'), item('GEO.NRS3.2','graph points on the coordinate plane to solve real-world and mathematical problems','Coordinate Plane'), item('GEO.NRS3.3','classify two-dimensional figures into categories based on their properties','Classification'), item('GEO.NRS3.4','solve real-world and mathematical problems involving area, surface area, and volume','Area/Surface/Volume') ],
+  'ABE NRS 4': [ item('GEO.NRS4.1','draw, construct, and describe geometrical figures and describe the relationships between them','Constructions/Relationships'), item('GEO.NRS4.2','solve real-life and mathematical problems involving angle, measure, area, surface area, and volume','Angle/Area/Volume'), item('GEO.NRS4.3','understand congruence and similarity using physical models, transparencies, or geometry software','Congruence/Similarity'), item('GEO.NRS4.4','understand and apply the pythagorean theorem','Pythagorean Theorem') ],
+  'ABE NRS 5': [ item('GEO.NRS5.1','experiment with transformations in the plane','Transformations'), item('GEO.NRS5.2','prove theorems involving similarity','Similarity Theorems'), item('GEO.NRS5.3','explain volume formulas and use them to solve problems','Volume Formulas'), item('GEO.NRS5.4','apply geometric concepts in modeling situations','Modeling') ],
+  'ABE NRS 6': [ item('GEO.NRS6.1','experiment with transformations in the plane','Transformations'), item('GEO.NRS6.2','prove theorems involving similarity','Similarity Theorems'), item('GEO.NRS6.3','explain volume formulas and use them to solve problems','Volume Formulas'), item('GEO.NRS6.4','apply geometric concepts in modeling situations','Modeling') ]
+};
+
+const CCRS_MEASDATA = {
+  'ABE NRS 1': [ item('MD.NRS1.1','measure lengths indirectly and by iterating length units','Length/Indirect & Iteration'), item('MD.NRS1.2','represent and interpret data','Data/Interpret') ],
+  'ABE NRS 2': [ item('MD.NRS2.1','measure and estimate lengths in standard units','Length/Standard Units'), item('MD.NRS2.2','relate addition and subtraction to length','Length & Operations'), item('MD.NRS2.3','solve problems involving measurement and estimation of intervals of time, liquid volumes, and masses of objects','Time/Volume/Mass'), item('MD.NRS2.4','represent and interpret data','Data/Interpret'), item('MD.NRS2.5','geometric measurement: understand concepts of area and relate to area of multiplication and addition','Area Concepts (×/+)'), item('MD.NRS2.6','geometric measurement: recognize perimeter as an attribute of plane figures and distinguish between linear and area measures','Perimeter vs Area') ],
+  'ABE NRS 3': [ item('MD.NRS3.1','solve problems involving measurement and conversion of measurements from a larger unit to a smaller unit','Measurement Conversion'), item('MD.NRS3.2','geometric measurement: understand concepts of angle and measure angles','Angles/Measure'), item('MD.NRS3.3','convert like measurement units within a given measurement system','Unit Conversion'), item('MD.NRS3.4','represent and interpret data','Data/Interpret'), item('MD.NRS3.5','geometric measurement: understand concepts of volume and relate volume to multiplication and to addition','Volume Concepts (×/+)') ]
+};
+
+const CCRS_FRACTIONS = {
+  'ABE NRS 2': [ item('FR.NRS2.1','develop understanding of fractions as numbers','Fractions as Numbers') ],
+  'ABE NRS 3': [ item('FR.NRS3.1','extend understanding of fraction equivalence and ordering','Equivalence/Ordering'), item('FR.NRS3.2','build fractions from unit fractions by applying and extending previous understanding of operations on whole numbers','Build from Unit Fractions'), item('FR.NRS3.3','understand decimal notation for fractions, and compare decimal fractions','Decimals & Fractions'), item('FR.NRS3.4','use equivalent fractions as strategy to add and subtract fractions','Add/Subtract via Equivalents'), item('FR.NRS3.5','apply and extend previous understanding of multiplication and division to multiply and divide fractions','Multiply/Divide Fractions') ]
+};
+
+const CCRS_RATIO = { 'ABE NRS 4': [ item('RP.NRS4.1','understand ratio concepts and use ratio reasoning to solve problems','Ratios/Proportional Reasoning') ] };
+
+const CCRS_EXPR = { 'ABE NRS 4': [ item('EE.NRS4.1','apply and extend previous understandings of arithmetic to algebraic expressions','Algebraic Expressions'), item('EE.NRS4.2','reason about and solve one-variable equations and inequalities','Equations/Inequalities'), item('EE.NRS4.3','represent and analyze quantitative relationships between dependent and independent variables','Quantitative Relationships'), item('EE.NRS4.4','use properties of operations to generate equivalent expressions','Equivalent Expressions'), item('EE.NRS4.5','solve real-life and mathematical problems using numerical and algebraic expressions and equations','Real-life Problems'), item('EE.NRS4.6','work with radicals and integer exponents','Radicals/Exponents'), item('EE.NRS4.7','understand the connections between proportional relationships, lines, and linear equations','Proportional & Linear'), item('EE.NRS4.8','analyze and solve linear equations and pairs of simultaneous linear equations','Linear Equations') ] };
+
+const CCRS_STATS = { 'ABE NRS 4': [ item('SP.NRS4.1','develop understanding of statistical variability','Statistical Variability'), item('SP.NRS4.2','summarize and describe distributions','Distributions'), item('SP.NRS4.3','use random sampling to draw inferences about a population','Random Sampling'), item('SP.NRS4.4','draw informal comparative inferences about two populations','Comparative Inferences'), item('SP.NRS4.5','investigate chance processes and develop, use, and evaluate probability models','Probability Models'), item('SP.NRS4.6','investigate patterns of association in bivariate data','Bivariate Data') ], 'ABE NRS 5': [ item('SP.NRS5.1','summarize, represent, and interpret data on a single count or measurable variable','Single Variable'), item('SP.NRS5.2','summarize, represent, and interpret data on two categorical and quantitative variables','Two Variables'), item('SP.NRS5.3','interpret linear models','Linear Models') ], 'ABE NRS 6': [ item('SP.NRS6.1','summarize, represent, and interpret data on a single count or measurable variable','Single Variable'), item('SP.NRS6.2','summarize, represent, and interpret data on two categorical and quantitative variables','Two Variables'), item('SP.NRS6.3','interpret linear models','Linear Models') ] };
+
+const CCRS_FUNCTIONS = { 'ABE NRS 4': [ item('F.NRS4.1','define, evaluate, and compare functions','Functions/Define-Evaluate-Compare'), item('F.NRS4.2','use functions to model relationships between quantities','Modeling with Functions') ], 'ABE NRS 5': [ item('F.NRS5.1','understand the concept of a function and use function notation','Function Notation'), item('F.NRS5.2','interpret functions that arise in applications in terms of the context','Interpret Functions (Context)'), item('F.NRS5.3','analyze functions using different representations','Analyze Functions/Representations') ], 'ABE NRS 6': [ item('F.NRS6.1','understand the concept of a function and use function notation','Function Notation'), item('F.NRS6.2','interpret functions that arise in applications in terms of the context','Interpret Functions (Context)'), item('F.NRS6.3','analyze functions using different representations','Analyze Functions/Representations') ] };
+
+const CCRS_QUANTITIES = { 'ABE NRS 5': [ item('Q.NRS5.1','reason quantitatively and use units to solve problems','Quantities/Units') ], 'ABE NRS 6': [ item('Q.NRS6.1','reason quantitatively and use units to solve problems','Quantities/Units') ] };
+
+const CCRS_ALGEBRA = { 'ABE NRS 5': [ item('A.NRS5.1','interpret the structure of expressions','Structure of Expressions'), item('A.NRS5.2','write expressions in equivalent forms to solve problems','Equivalent Forms'), item('A.NRS5.3','perform arithmetic operations on polynomials','Polynomials'), item('A.NRS5.4','rewrite rational expressions','Rational Expressions'), item('A.NRS5.5','create equations that describe numbers or relationships','Create Equations'), item('A.NRS5.6','understand solving equations as a process of reasoning and explain the reasoning','Reasoning about Equations'), item('A.NRS5.7','solve equations and inequalities in one variable','One-Variable Equations/Inequalities'), item('A.NRS5.8','solve systems of equations','Systems of Equations'), item('A.NRS5.9','represent and solve equations and inequalities graphically','Graphical Solutions') ], 'ABE NRS 6': [ item('A.NRS6.1','interpret the structure of expressions','Structure of Expressions'), item('A.NRS6.2','write expressions in equivalent forms to solve problems','Equivalent Forms'), item('A.NRS6.3','perform arithmetic operations on polynomials','Polynomials'), item('A.NRS6.4','rewrite rational expressions','Rational Expressions'), item('A.NRS6.5','create equations that describe numbers or relationships','Create Equations'), item('A.NRS6.6','understand solving equations as a process of reasoning and explain the reasoning','Reasoning about Equations'), item('A.NRS6.7','solve equations and inequalities in one variable','One-Variable Equations/Inequalities'), item('A.NRS6.8','solve systems of equations','Systems of Equations'), item('A.NRS6.9','represent and solve equations and inequalities graphically','Graphical Solutions') ] };
+
+
+const FL_RLA = {
+  'ABE NRS 1': [
+    item('RLA.L1.F.1.1','demonstrate knowledge of the basic concepts of print.','Foundational'),
+    item('RLA.L1.F.1.2','demonstrate phonological awareness.','Foundational'),
+    item('RLA.L1.F.1.3','use knowledge of grade-appropriate phonics and word-analysis skills to decode words accurately.','Foundational'),
+    item('RLA.L1.F.1.4','read grade-level texts with accuracy, automaticity, and appropriate prosody or expression.','Foundational'),
+
+    item('RLA.L1.R.2.1','use text features including titles, headings, captions, graphs, maps, glossaries, and/or illustrations to predict and confirm the topic as well as demonstrate understanding of texts.','Reading'),
+    item('RLA.L1.R.2.2','identify the topic of and relevant details in a text.','Reading'),
+    item('RLA.L1.R.2.4','identify and explain an author’s opinion(s) and supporting evidence.','Reading'),
+    item('RLA.L1.R.2.5','describe the connection between two individuals, events, ideas, or pieces of information in a text.','Reading'),
+
+    item('RLA.L1.R.3.1','identify and explain descriptive words and phrases, in text(s) and how people use them to communicate.','Reading'),
+    item('RLA.L1.R.3.2','retell a text in oral or written form to enhance comprehension','Reading'),
+    item('RLA.L1.R.3.3','compare and contrast two texts on the same topic.','Reading'),
+
+    item('RLA.L1.C.1.1','print all upper- and lowercase letters legibly.','Writing'),
+    item('RLA.L1.C.1.2','write narratives that retell two or more appropriately sequenced events, including relevant details and a sense of closure.','Writing'),
+    item('RLA.L1.C.1.3','write opinions about a topic or text with at least one supporting reason from a source and a sense of closure.','Writing'),
+    item('RLA.L1.C.1.4','write expository texts about a topic, using a source, providing facts and a sense of closure.','Writing'),
+    item('RLA.L1.C.1.5','with guidance and support from adults, improve writing, as needed, by planning, revising, and editing.','Writing'),
+
+    item('RLA.L1.C.2.1','present information orally using complete sentences and appropriate volume.','Speaking'),
+    item('RLA.L1.C.3.1','follow the rules of standard english grammar, punctuation, capitalization, and spelling appropriate to grade level.','Language'),
+    item('RLA.L1.C.4.1','recall information or participate in research to gather information to answer a question about a single topic.','Research'),
+
+    item('RLA.L1.C.5.1','use a multimedia element to enhance oral or written tasks.','Technology'),
+    item('RLA.L1.C.5.2','identify and use a variety of technology and digital tools to produce and publish writing individually or with peers and with support from adults.','Technology'),
+
+    item('RLA.L1.V.1.1','use grade-level academic vocabulary appropriately in speaking and writing.','Vocabulary'),
+    item('RLA.L1.V.1.2','identify and use base words and affixes to determine the meaning of unfamiliar words in grade-level content.','Vocabulary'),
+    item('RLA.L1.V.1.3','identify and use picture clues, context clues, word relationships, reference materials, and/or background knowledge to determine the meaning of unknown words.','Vocabulary')
+  ],
+  'ABE NRS 2': [
+    item('RLA.L2.F.1.3','use knowledge of grade-appropriate phonics and word-analysis skills to decode words.','Foundational'),
+    item('RLA.L2.F.1.4','read grade-level texts with accuracy, automaticity, and appropriate prosody or expression to support comprehension.','Foundational'),
+
+    // Note: You provided code RLA.L1.R.2.1 with an NRS 2 description. Kept exactly as provided; say the word to switch to RLA.L2.R.2.1.
+    item('RLA.L1.R.2.1','explain how text features (print and digital) contribute to meaning and identify the text structures of chronology, comparison, and cause/effect in texts.','Reading'),
+
+    item('RLA.L2.R.2.2','identify the central idea and explain how relevant details support that idea in a text.','Reading'),
+    item('RLA.L2.R.2.4','identify and explain an author’s claim and the reasons and evidence used to support the claim.','Reading'),
+    item('RLA.L2.R.2.5','describe the relationship between a series of historical events, scientific ideas or concepts, or steps in technical procedures in a text, using language that pertains to time, sequence, and cause/effect.','Reading'),
+
+    item('RLA.L2.R.3.1','identify and explain similes, idioms, alliteration, metaphors, personification, and hyperbole in text(s).','Reading'),
+    item('RLA.L2.R.3.2','retell a text to enhance comprehension.','Reading'),
+    item('RLA.L2.R.3.3','compare and contrast how two authors present information on the same topic or theme.','Reading'),
+
+    item('RLA.L2.C.1.1','write in cursive all upper- and lowercase letters, including fluently joining letters to create words.','Writing'),
+    item('RLA.L2.C.1.2','write personal or fictional narratives using a logical sequence of events, appropriate descriptions, dialogue, a variety of transitional words or phrases, and an ending.','Writing'),
+    item('RLA.L2.C.1.3','write opinions about a topic or text, include reasons supported by details from one or more sources, use transitions, and provide a conclusion.','Writing'),
+    item('RLA.L2.C.1.4','write expository texts about a topic, using one or more sources, providing an introduction, facts and details, some elaboration, transitions, and a conclusion.','Writing'),
+    item('RLA.L2.C.1.5','improve writing as needed by planning, revising, and editing with guidance and support from adults and feedback from peers.','Writing'),
+
+    item('RLA.L2.C.2.1','present information orally, in a logical sequence, using nonverbal cues, appropriate volume, and clear pronunciation.','Speaking'),
+    item('RLA.L2.C.3.1','follow the rules of standard english grammar, punctuation, capitalization, and spelling appropriate to grade level.','Language'),
+    item('RLA.L2.C.4.1','conduct research to answer a question, organizing information about the topic from multiple print and digital sources.','Research'),
+
+    item('RLA.L2.C.5.1','use two or more multimedia elements to enhance oral or written tasks.','Technology'),
+    item('RLA.L2.C.5.2','use digital writing tools individually or collaboratively to plan, draft, and revise writing.','Technology'),
+
+    item('RLA.L2.V.1.1','use grade-level academic vocabulary appropriately in speaking and writing.','Vocabulary')
+  ],
+  'ABE NRS 3': [],
+  'ABE NRS 4': [],
+  'ABE NRS 5': [],
+  'ABE NRS 6': []
+};
+
+
+// === Framework-aware Standards Type hook ===
+const TYPE_GROUPS = {
+  CCRS: [
+    'ABE_READ','ABE_LANG','ABE_WRITE','ABE_SPEAK','ABE_FOUND',
+    'ABE_BASETEN','ABE_NUMSYS','ABE_OAT','ABE_GEOM','ABE_MEASDATA',
+    'ABE_FRACT','ABE_RATIO','ABE_EXPR','ABE_STATS','ABE_FUNC',
+    'ABE_QUANT','ABE_ALG'
+  ],
+  FLBEST: ['FL_RLA']
+};
+
+function enforceTypeByFramework(){
+  const fw = frameworkSel.value;
+  const allowed = new Set(TYPE_GROUPS[fw] || []);
+  [...stdTypeSel.options].forEach(opt => {
+    const ok = allowed.has(opt.value);
+    opt.hidden = !ok; opt.disabled = !ok;
+  });
+  if(!allowed.has(stdTypeSel.value)){
+    const saved = localStorage.getItem('lastType_'+fw);
+    const fallback = (fw==='CCRS' ? 'ABE_READ' : 'FL_RLA');
+    stdTypeSel.value = (saved && allowed.has(saved)) ? saved : fallback;
+  }
+}
+
+// === Workforce etc ===
+const Workforce = {
+  'Health Science': ['completing a patient intake form','recording and interpreting vital signs','following infection control procedures','documenting patient data in an ehr','communicating discharge instructions'],
+  'Information Technology Assistant': ['creating and updating a help-desk ticket','identifying microcomputer components','installing approved software','resetting passwords following security policy','writing a status update for a non-technical user'],
+  'Semiconductor / Advanced Manufacturing': ['following esd safety protocols','reading a process flow diagram','inspecting a circuit board for defects','completing a shift handoff log','calculating yield and scrap rates']
+};
+const Employability = ['critical thinking skills','interpersonal skills','personal qualities','resource management','information','communication','systems thinking','technology'];
+const Supports = ['sentence frames','word bank','model text','graphic organizer','paired practice','visuals/diagrams','bilingual glossary','dictation/echo reading','chunked directions'];
+
+const frameworkSel = document.getElementById('framework');
+const stdTypeSel = document.getElementById('stdType');
+const nrsSel = document.getElementById('nrs');
+const stdLabel = document.getElementById('stdLabel');
+const stdContainer = document.getElementById('stdContainer');
+const industrySel = document.getElementById('industry');
+const taskSel = document.getElementById('task');
+const skillsSel = document.getElementById('skills');
+const supportsSel = document.getElementById('supports');
+const outEl = document.getElementById('output');
+const objList = document.getElementById('objList');
+const allText = document.getElementById('allText');
+const programInput = document.getElementById('program');
+const objectives = [];
+
+document.getElementById('year').textContent = new Date().getFullYear();
+
+function init(){
+  Employability.forEach(s => skillsSel.add(new Option(s, s)));
+  Supports.forEach(s => supportsSel.add(new Option(s, s)));
+  // Remember per-framework type
+  stdTypeSel.addEventListener('change', ()=>{
+    const fw=frameworkSel.value; localStorage.setItem('lastType_'+fw, stdTypeSel.value); loadStandards();
+  });
+  frameworkSel.addEventListener('change', ()=>{ enforceTypeByFramework(); loadStandards(); });
+  enforceTypeByFramework();
+  loadStandards();
+  loadTasks();
+}
+
+function buildStdItem(groupName, code, phrase, tag, checked){
+  const label = document.createElement('label'); label.className='std-item';
+  const input = document.createElement('input'); input.type='radio'; input.name='stdItem'; input.value=code; input.dataset.phrase=phrase; if(checked) input.checked=true; label.appendChild(input); label.appendChild(document.createTextNode(' '));
+  if(tag){ const tagEl=document.createElement('span'); tagEl.className='tag'; tagEl.textContent='['+tag+']'; label.appendChild(tagEl); }
+  label.appendChild(document.createTextNode((tag?' ':'')+code+' — '+phrase));
+  return label;
+}
+
+function datasetFor(type){
+  if(frameworkSel.value==='FLBEST' && type==='FL_RLA') return FL_RLA;
+  return (type==='ABE_LANG')?CCRS_LANGUAGE:
+         (type==='ABE_WRITE')?CCRS_WRITING:
+         (type==='ABE_SPEAK')?CCRS_SPEAK_LISTEN:
+         (type==='ABE_FOUND')?CCRS_FOUNDATIONAL:
+         (type==='ABE_BASETEN')?CCRS_BASE_TEN:
+         (type==='ABE_NUMSYS')?CCRS_NUMBER_SYSTEM:
+         (type==='ABE_OAT')?CCRS_OAT:
+         (type==='ABE_GEOM')?CCRS_GEOMETRY:
+         (type==='ABE_MEASDATA')?CCRS_MEASDATA:
+         (type==='ABE_FRACT')?CCRS_FRACTIONS:
+         (type==='ABE_RATIO')?CCRS_RATIO:
+         (type==='ABE_EXPR')?CCRS_EXPR:
+         (type==='ABE_STATS')?CCRS_STATS:
+         (type==='ABE_FUNC')?CCRS_FUNCTIONS:
+         (type==='ABE_QUANT')?CCRS_QUANTITIES:
+         (type==='ABE_ALG')?CCRS_ALGEBRA:
+         CCRS_READING;
+}
+
+function labelFor(type){
+  const m = {'ABE_LANG':'Language','ABE_WRITE':'Writing','ABE_SPEAK':'Speaking & Listening','ABE_FOUND':'Foundational Skills','ABE_BASETEN':'Mathematics — Base Ten','ABE_NUMSYS':'Mathematics — The Number System','ABE_OAT':'Mathematics — Operations & Algebraic Thinking','ABE_GEOM':'Mathematics — Geometry','ABE_MEASDATA':'Mathematics — Measurement & Data','ABE_FRACT':'Mathematics — Fractions','ABE_RATIO':'Mathematics — Ratios & Proportional Relationships','ABE_EXPR':'Mathematics — Expressions & Equations','ABE_STATS':'Mathematics — Statistics and Probability','ABE_FUNC':'Mathematics — Functions','ABE_QUANT':'Mathematics — Quantities','ABE_ALG':'Mathematics — Algebra','ABE_READ':'Reading','FL_RLA':'Florida ABE — Reasoning through Language Arts (B.E.S.T.)'};
+  return m[type]||'Reading';
+}
+
+function loadStandards(){
+  stdContainer.innerHTML='';
+  const type = stdTypeSel.value; const level=nrsSel.value; stdLabel.textContent = labelFor(type)+' (by selected level)';
+  const ds = datasetFor(type); const list = (ds[level]||[]);
+  if(!list.length){ const div=document.createElement('div'); div.className='empty'; div.textContent='no standards defined for '+level+' in this set'; stdContainer.appendChild(div); return; }
+  list.forEach((s,i)=> stdContainer.appendChild(buildStdItem(type, s.code, s.phrase, s.tag, i===0)));
+}
+
+function getSelectedStandard(){ const el=stdContainer.querySelector('input[name="stdItem"]:checked'); if(!el) return null; return {code:el.value, phrase:el.dataset.phrase}; }
+function loadTasks(){ taskSel.innerHTML=''; (Workforce[industrySel.value]||[]).forEach(t=>taskSel.add(new Option(t,t))); if(taskSel.options.length) taskSel.selectedIndex=0; }
+
+industrySel.addEventListener('change', loadTasks);
+nrsSel.addEventListener('change', loadStandards);
+
+function oxfordJoin(list){ if(!list.length) return ''; if(list.length===1) return list[0]; if(list.length===2) return list[0]+' and '+list[1]; return list.slice(0,-1).join(', ')+', and '+list[list.length-1]; }
+
+function generateSentence(){
+  const fw=frameworkSel.value; const type=stdTypeSel.value; const sel=getSelectedStandard(); const phrase=sel?sel.phrase:'meet the selected standard'; const task=taskSel.value||'a relevant workplace task'; const skills=[...skillsSel.selectedOptions].map(o=>o.value).slice(0,3); const supports=[...supportsSel.selectedOptions].map(o=>o.value).slice(0,3); const notes=document.getElementById('notes').value.trim();
+  const skillText = skills.length? oxfordJoin(skills):'appropriate employability skills'; let base = `Students will be able to ${phrase} by ${task}, and using ${skillText}`; if(supports.length) base += `, with supports such as ${oxfordJoin(supports)}`;
+  const level=nrsSel.value; let align;
+  if(fw==='FLBEST' && type==='FL_RLA') align = `Florida B.E.S.T. — ABE Reasoning through Language Arts (${level})`;
+  else { const map={'ABE_LANG':'CCRS Language','ABE_WRITE':'CCRS Writing','ABE_SPEAK':'CCRS Speaking & Listening','ABE_FOUND':'CCRS Foundational Skills','ABE_BASETEN':'CCRS Mathematics — Base Ten','ABE_NUMSYS':'CCRS Mathematics — The Number System','ABE_OAT':'CCRS Mathematics — Operations & Algebraic Thinking','ABE_GEOM':'CCRS Mathematics — Geometry','ABE_MEASDATA':'CCRS Mathematics — Measurement & Data','ABE_FRACT':'CCRS Mathematics — Fractions','ABE_RATIO':'CCRS Mathematics — Ratios & Proportional Relationships','ABE_EXPR':'CCRS Mathematics — Expressions & Equations','ABE_STATS':'CCRS Mathematics — Statistics and Probability','ABE_FUNC':'CCRS Mathematics — Functions','ABE_QUANT':'CCRS Mathematics — Quantities','ABE_ALG':'CCRS Mathematics — Algebra','ABE_READ':'CCRS Reading'}; align = `${map[type]||'CCRS Reading'} (${level})`; }
+  base += `. (Aligned to ${align})`; if(notes) base += ` ${notes}`; return base;
+}
+
+function renderOutput(){ const s=generateSentence(); outEl.style.display='block'; outEl.textContent=s; }
+
+document.getElementById('generate').addEventListener('click', renderOutput);
+document.getElementById('copyOne').addEventListener('click', ()=>{ if(!outEl.textContent) renderOutput(); if(!outEl.textContent) return; navigator.clipboard.writeText(outEl.textContent); });
+document.getElementById('reset').addEventListener('click', ()=>{ outEl.textContent=''; outEl.style.display='none'; });
+
+document.getElementById('add').addEventListener('click', ()=>{ let s=outEl.textContent.trim(); if(!s) s=generateSentence(); if(!s) return; objectives.push(s); updateList(); });
+
+function updateList(){ objList.innerHTML=''; objectives.forEach((text,idx)=>{ const li=document.createElement('li'); li.textContent=text; const act=document.createElement('span'); act.className='item-actions'; const del=document.createElement('button'); del.textContent='remove'; del.addEventListener('click',()=>{objectives.splice(idx,1); updateList();}); const up=document.createElement('button'); up.textContent='up'; up.addEventListener('click',()=>{ if(idx>0){ const t=objectives[idx-1]; objectives[idx-1]=objectives[idx]; objectives[idx]=t; updateList(); }}); const down=document.createElement('button'); down.textContent='down'; down.addEventListener('click',()=>{ if(idx<objectives.length-1){ const t=objectives[idx+1]; objectives[idx+1]=objectives[idx]; objectives[idx]=t; updateList(); }}); act.appendChild(del); act.appendChild(up); act.appendChild(down); li.appendChild(act); objList.appendChild(li); }); allText.value = objectives.join('\n\n'); }
+
+// Copy all
+ document.getElementById('copyAll').addEventListener('click', ()=>{ if(!objectives.length){ renderOutput(); objectives.push(outEl.textContent.trim()); updateList(); } navigator.clipboard.writeText(allText.value||''); });
+
+// Download .txt
+ document.getElementById('downloadTxt').addEventListener('click', ()=>{ const blob=new Blob([allText.value||''],{type:'text/plain'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='SSLO_Objectives.txt'; a.click(); setTimeout(()=>URL.revokeObjectURL(url),1000); });
+
+// Export to Word (.rtf)
+function rtfEscape(str){ return str.replace(/\\/g,'\\\\').replace(/\{/g,'\\{').replace(/\}/g,'\\}').replace(/\n/g,'\\line '); }
+
+document.getElementById('downloadRtf').addEventListener('click', ()=>{ if(!objectives.length){ renderOutput(); objectives.push(outEl.textContent.trim()); updateList(); } const title='SSLO Objectives'; const program=programInput.value.trim(); const now=new Date(); const header=[title, program?('Program: '+program):'', 'Date: '+now.toLocaleString()].filter(Boolean).join('\n'); const body=(allText.value||'').split(/\n\n/).map((t,i)=> (i+1)+'. '+t).join('\n\n'); const rtf='{\\rtf1\\ansi\\deff0\n'+'{\\b '+rtfEscape(header)+'}\\line\\line\n'+rtfEscape(body)+'\n}'; const blob=new Blob([rtf],{type:'application/rtf'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='SSLO_Objectives.rtf'; a.click(); setTimeout(()=>URL.revokeObjectURL(url),1000); });
+
+init();
+</script>
+</body>
+</html>
